@@ -6,6 +6,7 @@ resource "proxmox_download_file" "ubuntu_server_image" {
   overwrite    = false
 }
 
+# TODO: Create modules combining both control plane vm and worker vms
 resource "proxmox_virtual_environment_vm" "control_plane_vm" {
   count       = var.control_plane_count
   name        = "server"
@@ -27,18 +28,27 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
     floating  = var.control_plane_memory
   }
 
-  # TODO: Learn details about disk
+  # TODO: Learn details about storage
+  cdrom {
+    file_id = proxmox_download_file.ubuntu_server_image.id
+  }
+
   disk {
     discard   = "on"
-    file_id   = proxmox_download_file.ubuntu_server_image.id
     interface = "scsi0"
     iothread  = true
-    size      = var.control_plane_disk_size
+    size      = var.worker_disk_size
     ssd       = true
   }
 
   network_device {
     bridge = "vmbr0"
+  }
+
+  bios = "ovmf"
+
+  operating_system {
+    type = "l26"
   }
 
   initialization {
@@ -77,10 +87,12 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
     floating  = var.worker_memory
   }
 
-  # Learn details about disk
+  cdrom {
+    file_id = proxmox_download_file.ubuntu_server_image.id
+  }
+
   disk {
     discard   = "on"
-    file_id   = proxmox_download_file.ubuntu_server_image.id
     interface = "scsi0"
     iothread  = true
     size      = var.worker_disk_size
@@ -90,6 +102,8 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
   network_device {
     bridge = "vmbr0"
   }
+
+  bios = "ovmf"
 
   operating_system {
     type = "l26"
