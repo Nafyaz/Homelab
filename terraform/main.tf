@@ -14,9 +14,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
   description = "Kubernetes control plane node"
   node_name   = var.proxmox_node
 
-  agent {
-    enabled = true
-  }
+  machine = "q35"
 
   cpu {
     cores = var.control_plane_cpu
@@ -38,8 +36,14 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
     ssd       = true
   }
 
+  efi_disk {
+    datastore_id      = "local-lvm"
+    pre_enrolled_keys = true
+  }
+
   network_device {
-    bridge = "vmbr0"
+    bridge   = "vmbr0"
+    firewall = true
   }
 
   bios = "ovmf"
@@ -64,6 +68,10 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
       password = var.vm_password
     }
   }
+
+  agent {
+    enabled = true
+  }
 }
 
 resource "proxmox_virtual_environment_vm" "worker_vm" {
@@ -72,9 +80,7 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
   description = "Kubernetes worker node ${count.index}"
   node_name   = var.proxmox_node
 
-  agent {
-    enabled = true
-  }
+  machine = "q35"
 
   cpu {
     cores = var.worker_cpu
@@ -95,8 +101,14 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
     ssd       = true
   }
 
+  efi_disk {
+    datastore_id      = "local-lvm"
+    pre_enrolled_keys = true
+  }
+
   network_device {
-    bridge = "vmbr0"
+    bridge   = "vmbr0"
+    firewall = true
   }
 
   bios = "ovmf"
@@ -119,5 +131,9 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
       username = var.vm_username
       password = var.vm_password
     }
+  }
+
+  agent {
+    enabled = true
   }
 }

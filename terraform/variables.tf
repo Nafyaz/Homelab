@@ -54,7 +54,7 @@ variable "control_plane_count" {
 variable "control_plane_cpu" {
   description = "Core count"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "control_plane_memory" {
@@ -82,7 +82,7 @@ variable "worker_count" {
 variable "worker_cpu" {
   description = "Core count"
   type        = number
-  default     = 1
+  default     = 2
 }
 
 variable "worker_memory" {
