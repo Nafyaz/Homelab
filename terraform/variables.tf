@@ -7,14 +7,15 @@ variable "proxmox_username" {
   type = string
 }
 
-variable "proxmox_password" {
+# variable "proxmox_password" {
+#   type      = string
+#   sensitive = true
+# }
+
+variable "proxmox_api_token" {
   type      = string
   sensitive = true
 }
-
-# variable "proxmox_api_token" {
-#   type = string
-# }
 
 variable "proxmox_node" {
   type = string
@@ -37,9 +38,8 @@ variable "vm_password" {
 
 # Kubernetes related stuff.
 variable "control_plane_id_start" {
-  description = "this is for proxmox id assignment. Also used for static ip."
-  type        = number
-  default     = 301
+  type    = number
+  default = 301
 }
 
 variable "control_plane_count" {
@@ -66,9 +66,8 @@ variable "control_plane_disk_size" {
 }
 
 variable "worker_id_start" {
-  description = "this is for proxmox id assignment. Also used for static ip."
-  type        = number
-  default     = 401
+  type    = number
+  default = 401
 }
 
 variable "worker_count" {

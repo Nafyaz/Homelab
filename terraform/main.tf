@@ -1,15 +1,15 @@
-resource "proxmox_download_file" "ubuntu_server_image" {
-  content_type = "iso"
+resource "proxmox_download_file" "ubuntu_server_cloud_image" {
+  content_type = "import"
   datastore_id = "local"
   node_name    = var.proxmox_node
-  url          = "https://releases.ubuntu.com/24.04.4/ubuntu-24.04.4-live-server-amd64.iso"
+  url          = "https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img"
   overwrite    = false
 }
 
 # TODO: Create modules combining both control plane vm and worker vms
 resource "proxmox_virtual_environment_vm" "control_plane_vm" {
   count       = var.control_plane_count
-  name        = "server"
+  name        = "k8s-control-plane-${count.index}"
   description = "Kubernetes control plane node"
   node_name   = var.proxmox_node
   vm_id       = var.control_plane_id_start + count.index
@@ -29,15 +29,12 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
   }
 
   # TODO: Learn details about storage
-  cdrom {
-    file_id = proxmox_download_file.ubuntu_server_image.id
-  }
-
   disk {
     discard   = "on"
+    file_id   = proxmox_download_file.ubuntu_server_cloud_image.id
     interface = "scsi0"
     iothread  = true
-    size      = var.worker_disk_size
+    size      = var.control_plane_disk_size
     ssd       = true
   }
 
@@ -51,6 +48,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
     type = "l26"
   }
 
+  # TODO: vm ip should not be coupled with the vm id
   initialization {
     ip_config {
       ipv4 {
@@ -68,7 +66,7 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
 
 resource "proxmox_virtual_environment_vm" "worker_vm" {
   count       = var.worker_count
-  name        = "node-${count.index}"
+  name        = "k8s-worker-${count.index}"
   description = "Kubernetes worker node ${count.index}"
   node_name   = var.proxmox_node
   vm_id       = var.worker_id_start + count.index
@@ -87,12 +85,9 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
     floating  = var.worker_memory
   }
 
-  cdrom {
-    file_id = proxmox_download_file.ubuntu_server_image.id
-  }
-
   disk {
     discard   = "on"
+    file_id   = proxmox_download_file.ubuntu_server_cloud_image.id
     interface = "scsi0"
     iothread  = true
     size      = var.worker_disk_size
