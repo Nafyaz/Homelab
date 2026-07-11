@@ -1,9 +1,10 @@
 resource "proxmox_download_file" "ubuntu_server_cloud_image" {
-  content_type = "import"
+  content_type = "iso"
   datastore_id = "local"
+  file_name    = "ubuntu-24.04-server-cloudimg-amd64.iso"
   node_name    = var.proxmox_node
-  url          = "https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img"
   overwrite    = false
+  url          = "https://cloud-images.ubuntu.com/releases/noble/release/ubuntu-24.04-server-cloudimg-amd64.img"
 }
 
 # TODO: Create modules combining both control plane vm and worker vms
@@ -12,10 +13,9 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
   name        = "k8s-control-plane-${count.index}"
   description = "Kubernetes control plane node"
   node_name   = var.proxmox_node
-  vm_id       = var.control_plane_id_start + count.index
 
   agent {
-    enabled = false
+    enabled = true
   }
 
   cpu {
@@ -50,9 +50,11 @@ resource "proxmox_virtual_environment_vm" "control_plane_vm" {
 
   # TODO: vm ip should not be coupled with the vm id
   initialization {
+    datastore_id = "local-lvm"
+
     ip_config {
       ipv4 {
-        address = "192.168.1.${var.control_plane_id_start + count.index}/24"
+        address = "192.168.1.${var.control_plane_ip_start + count.index}/24"
         gateway = var.gateway_ip
       }
     }
@@ -69,10 +71,9 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
   name        = "k8s-worker-${count.index}"
   description = "Kubernetes worker node ${count.index}"
   node_name   = var.proxmox_node
-  vm_id       = var.worker_id_start + count.index
 
   agent {
-    enabled = false
+    enabled = true
   }
 
   cpu {
@@ -105,9 +106,11 @@ resource "proxmox_virtual_environment_vm" "worker_vm" {
   }
 
   initialization {
+    datastore_id = "local-lvm"
+
     ip_config {
       ipv4 {
-        address = "192.168.1.${var.worker_id_start + count.index}/24"
+        address = "192.168.1.${var.worker_ip_start + count.index}/24"
         gateway = var.gateway_ip
       }
     }

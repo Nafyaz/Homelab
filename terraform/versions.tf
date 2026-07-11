@@ -1,13 +1,13 @@
 terraform {
   required_version = "~> 1.15.8"
 
-  cloud {
-    organization = "nafyaz"
+  # cloud {
+  #   organization = "nafyaz"
 
-    workspaces {
-      name = "laddu"
-    }
-  }
+  #   workspaces {
+  #     name = "laddu"
+  #   }
+  # }
 
   required_providers {
     proxmox = {
