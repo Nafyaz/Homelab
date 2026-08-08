@@ -25,12 +25,6 @@ variable "proxmox_node" {
 #   type = string
 # }
 
-variable "gateway_ip" {
-  type    = string
-  default = "192.168.1.1"
-}
-
-# For VMs; applies to different VMs running inside proxmox.
 variable "vm_username" {
   type = string
 }
@@ -38,61 +32,4 @@ variable "vm_username" {
 variable "vm_password" {
   type      = string
   sensitive = true
-}
-
-# Kubernetes related stuff.
-variable "control_plane_ip_start" {
-  type    = number
-  default = 220
-}
-
-variable "control_plane_count" {
-  type    = number
-  default = 1
-}
-
-variable "control_plane_cpu" {
-  description = "Core count"
-  type        = number
-  default     = 2
-}
-
-variable "control_plane_memory" {
-  description = "RAM in MB"
-  type        = number
-  default     = 2048
-}
-
-variable "control_plane_disk_size" {
-  description = "Disk size in GB"
-  type        = number
-  default     = 100
-}
-
-variable "worker_ip_start" {
-  type    = number
-  default = 250
-}
-
-variable "worker_count" {
-  type    = number
-  default = 2
-}
-
-variable "worker_cpu" {
-  description = "Core count"
-  type        = number
-  default     = 2
-}
-
-variable "worker_memory" {
-  description = "RAM in MB"
-  type        = number
-  default     = 2048
-}
-
-variable "worker_disk_size" {
-  description = "Disk size in GB"
-  type        = number
-  default     = 100
 }
