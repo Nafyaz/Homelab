@@ -3,7 +3,7 @@ terraform {
 
   cloud {
     organization = "nafyaz"
-    hostname     = "app.teraform.io"
+    hostname     = "app.terraform.io"
 
     workspaces {
       name = "laddu"
